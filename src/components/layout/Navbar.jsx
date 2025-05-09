@@ -21,19 +21,24 @@ const Navbar = ({ scrolled }) => {
   
   // Close menu when clicking outside
   useEffect(() => {
-    if (!isMenuOpen) return
-    
     const handleClickOutside = (e) => {
       if (!e.target.closest('.mobile-menu') && !e.target.closest('.menu-button')) {
         setIsMenuOpen(false)
       }
     }
     
-    document.addEventListener('click', handleClickOutside)
+    if (isMenuOpen) {
+      document.addEventListener('click', handleClickOutside)
+    }
+    
     return () => document.removeEventListener('click', handleClickOutside)
   }, [isMenuOpen])
   
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
+  const toggleMenu = (e) => {
+    e.stopPropagation() // Prevent event from bubbling
+    setIsMenuOpen(!isMenuOpen)
+  }
+  
   const toggleSearch = () => setIsSearchOpen(!isSearchOpen)
 
   return (
@@ -44,7 +49,7 @@ const Navbar = ({ scrolled }) => {
           <Link to="/" className="flex items-center">
             <span className="text-2xl font-bold text-primary-600">Game<span className="text-accent-500">Verse</span></span>
           </Link>
-          
+            
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
             <NavLink to="/" className={({ isActive }) => 
@@ -92,6 +97,7 @@ const Navbar = ({ scrolled }) => {
               className="menu-button p-2 md:hidden text-gray-600 hover:text-primary-600 transition-colors"
               onClick={toggleMenu}
               aria-label="Toggle menu"
+              aria-expanded={isMenuOpen}
             >
               {isMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
             </button>
@@ -103,11 +109,11 @@ const Navbar = ({ scrolled }) => {
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div 
-            className="mobile-menu md:hidden bg-white"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            className="mobile-menu md:hidden bg-white shadow-lg"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
           >
             <div className="container-custom py-4 flex flex-col space-y-2">
               <NavLink 
@@ -166,9 +172,9 @@ const Navbar = ({ scrolled }) => {
         {isSearchOpen && (
           <motion.div 
             className="absolute top-full left-0 w-full bg-white shadow-md"
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
           >
             <div className="container-custom py-4">
